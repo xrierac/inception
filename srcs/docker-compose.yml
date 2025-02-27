@@ -1,20 +1,51 @@
 services:
   nginx:
+    build: ./requirements/nginx
+    image: nginx
     ports:
       - "443:443"
-    env_file:
-      - ./.env
+    networks:
+      - inception
+    restart: unless-stopped
+
   mariadb:
+    build: ./requirements/mariadb
+    image: mariadb
     ports:
       - "3306:3306"
     env_file:
       - ./.env
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - inception
+    restart: unless-stopped
+
   wordpress:
+    build: ./requirements/wordpress
+    image: wordpress
     ports:
       - "9000:9000"
     env_file:
       - .env
+    networks:
+      - inception
+    restart: unless-stopped
 
 networks:
   inception:
     driver: bridge
+
+volumes:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/xriera-c/data/mariadb
+      o: bind
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/xriera-c/data/wordpress
+      o: bind
