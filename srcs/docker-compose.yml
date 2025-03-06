@@ -43,6 +43,7 @@ volumes:
       type: none
       device: /home/xriera-c/data/mariadb
       o: bind
+
   wordpress_data:
     driver: local
     driver_opts:

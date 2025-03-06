@@ -1,19 +1,23 @@
 #!/bin/sh
+mariadb-install-db --datadir=/var/lib/mysql --user=mysql
 
-if [ -z "$(ls -A /var/lib/mysql)" ]; then
-	mysql_install_db --user=mysql --datadir=/var/lib/mysql
-	mysqld --user=mysql --bootstrap << EOF
+# Enforce root pw, create db, add user, give rights
+mysqld --user=mysql --bootstrap << EOF
+USE mysql;
+FLUSH PRIVILEGES;
 
-CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
+DELETE FROM mysql.user WHERE User='';
+DROP DATABASE IF EXISTS test;
+DELETE FROM mysql.db WHERE Db='test';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
 
-CREATE USER '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
-GRANT ALL PRIVILEGES ON '${MYSQL_DATABASE}'.* TO '${MYSQL_USER}'@'%';
-
-CREATE USER '${MYSQL_ADMIN_USER}'@'%' IDENTIFIED BY '${MYSQL_ADMIN_PASSWORD}';
-GRANT ALL PRIVILEGES ON *.* TO '${MYSQL_ADMIN_USER}'@'%' WITH GRANT OPTION;
-
+ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ADMIN_PASSWORD';
+CREATE DATABASE $MYSQL_DATABASE CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE USER '$MYSQL_USER'@'%' IDENTIFIED by '$MYSQL_PASSWORD';
+GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'%';
+GRANT ALL PRIVILEGES ON *.* TO '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD' WITH GRANT OPTION;
+GRANT SELECT ON mysql.* TO '$MYSQL_USER'@'%';
 FLUSH PRIVILEGES;
 EOF
-fi
 
-exec "mysqld --user=mysql"
+exec mysqld --defaults-file=/etc/my.cnf.d/mariadb-server.cnf
