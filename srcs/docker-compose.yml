@@ -4,6 +4,8 @@ services:
     image: nginx
     ports:
       - "443:443"
+    volumes:
+      - wordpress_data:/var/www/html
     networks:
       - inception
     restart: unless-stopped
@@ -28,6 +30,8 @@ services:
       - "9000:9000"
     env_file:
       - .env
+    volumes:
+      - wordpress_data:/var/www/html
     networks:
       - inception
     restart: unless-stopped

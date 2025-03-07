@@ -4,11 +4,10 @@ RUN addgroup -S nginx && \
     adduser -S -G nginx nginx
 
 RUN apk add --no-cache \
+	wget \
 	php82 \
 	php82-fpm \
 	php82-mysqli \
-
-EXPOSE 9000
 
 RUN ln -sf /usr/bin/php82 /usr/bin/php
 
