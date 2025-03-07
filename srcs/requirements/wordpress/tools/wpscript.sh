@@ -1,41 +1,54 @@
 #!/bin/sh
 
-while ! mysqladmin ping -h"mariadb" --silent; do
+while ! mysqladmin ping -h"mariadb" --silent -u"${DB_USER}" -p"${DB_PW}"; do
     echo "Waiting for MariaDB..."
     sleep 5
 done
 
-# Set correct permissions for the WordPress directory
+# Ensure correct directory permissions
 chown -R www:www /var/www/html
 
-# Download and configure WordPress if not already done
+# WordPress setup
 if [ ! -f wp-config.php ]; then
-    # Download WordPress as www user
-    su www -s /bin/sh -c "wp core download"
+    echo "Installing WordPress..."
 
-    # Create wp-config.php as www user
-    su www -s /bin/sh -c "wp config create \
-        --dbname=${DB_NAME} \
-        --dbuser=${DB_USER} \
-        --dbpass=${DB_PW} \
-        --dbhost=mariadb"
+    # Clean directory first
+    rm -rf /var/www/html/*
 
-    # Install WordPress as www user
-    su www -s /bin/sh -c "wp core install \
-        --url=https://${DOMAIN_NAME} \
-        --title='${WP_TITLE}' \
-        --admin_user=${WP_ADMIN_USER} \
-        --admin_password=${WP_ADMIN_PW} \
-        --admin_email=${WP_ADMIN_EMAIL}"
+    # Download WordPress core
+    wp core download --allow-root --path=/var/www/html
 
-    # Create additional user as www user
-    su www -s /bin/sh -c "wp user create ${WP_USER} ${WP_USER_EMAIL} \
+    # Create config
+    wp config create \
+        --allow-root \
+        --dbname="${DB_NAME}" \
+        --dbuser="${DB_USER}" \
+        --dbpass="${DB_PW}" \
+        --dbhost="mariadb" \
+        --path=/var/www/html
+
+    # Install WordPress
+    wp core install \
+        --allow-root \
+        --path=/var/www/html \
+        --url="https://${DOMAIN_NAME}" \
+        --title="${WP_TITLE}" \
+        --admin_user="${WP_ADMIN_USER}" \
+        --admin_password="${WP_ADMIN_PW}" \
+        --admin_email="${WP_ADMIN_EMAIL}"
+
+    # Create additional user
+    wp user create \
+        --allow-root \
+        --path=/var/www/html \
+        "${WP_USER}" "${WP_USER_EMAIL}" \
         --role=author \
-        --user_pass=${WP_USER_PW}"
+        --user_pass="${WP_USER_PW}"
 
-    # Double-check permissions
+    # Set correct permissions
     chown -R www:www /var/www/html
+    chmod -R 755 /var/www/html
 fi
 
-# Start PHP-FPM
-exec php-fpm82 -F
+echo "Starting PHP-FPM..."
+exec /usr/sbin/php-fpm82 -F

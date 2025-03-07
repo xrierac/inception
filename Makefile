@@ -5,21 +5,26 @@ SSL_CERT = $(SSL_DIR)/nginx.crt
 SSL_KEY = $(SSL_DIR)/nginx.key
 
 # Colors for better output
-GREEN = \033[0;32m
-YELLOW = \033[0;33m
-RED = \033[0;31m
-RESET = \033[0m
+GREEN = $$(printf '\033[0;32m')
+YELLOW = $$(printf '\033[0;33m')
+RED = $$(printf '\033[0;31m')
+RESET = $$(printf '\033[0m')
 
 all: setup build up
 
 # Setup environment
 setup: ssl_cert
 	@echo "$(YELLOW)Setting up environment...$(RESET)"
-	@if [ ! -d "/home/$(USER)/data" ]; then \
+	@if [ ! -d "/home/$(USER)/data/wordpress" ]; then \
 		echo "$(YELLOW)Creating data directories...$(RESET)"; \
 		mkdir -p /home/$(USER)/data/wordpress; \
+		chmod 755 /home/$(USER)/data/wordpress; \
+		echo "$(GREEN)Wordpress directory created.$(RESET)"; \
+	fi
+	@if [ ! -d "/home/$(USER)/data/mariadb" ]; then \
 		mkdir -p /home/$(USER)/data/mariadb; \
-		echo "$(GREEN)Data directories created.$(RESET)"; \
+		chmod 755 /home/$(USER)/data/mariadb; \
+		echo "$(GREEN)MariaDB directory created.$(RESET)"; \
 	fi
 
 # Generate SSL certificate for nginx
