@@ -1,22 +1,37 @@
 FROM alpine:3.20
 
-RUN addgroup -S nginx && \
-    adduser -S -G nginx nginx
-
-RUN apk add --no-cache \
-	wget \
+RUN addgroup -S www && \
+    adduser -S -G www www && \
+    apk add --no-cache \
 	php82 \
-	php82-fpm \
-	php82-mysqli \
+    php82-fpm \
+    php82-mysqli \
+    php82-json \
+    php82-curl \
+    php82-dom \
+    php82-exif \
+    php82-fileinfo \
+    php82-mbstring \
+    php82-openssl \
+    php82-xml \
+    php82-zip \
+    php82-phar \
+    mariadb-client \
+    curl \
+    wget \
+    unzip
 
-RUN ln -sf /usr/bin/php82 /usr/bin/php
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+	chmod +x wp-cli.phar && \
+	mv wp-cli.phar /usr/local/bin/wp
 
-RUN mkdir -p /run/php /var/www/html
+COPY conf/www.conf /etc/php82/php-fpm.d/www.conf
+COPY tools/wpscript.sh /usr/local/bin/
 
-COPY ./requirements/wordpress/conf/www.conf /etc/php82/php-fpm.d/www.conf
+RUN mkdir -p /run/php /var/www/html && \
+	chown -R www:www /run/php /var/www/html && \
+	chmod +x /usr/local/bin/wpscript.sh
 
-COPY ./requirements/wordpress/tools/wpscript.sh /tmp/wpscript.sh
+WORKDIR /var/www/html
 
-RUN chmod +x /tmp/wpscript.sh
-
-ENTRYPOINT ["sh", "/tmp/wpscript.sh"]
+ENTRYPOINT ["/usr/local/bin/wpscript.sh"]

@@ -3,7 +3,7 @@ FROM alpine:3.20
 RUN apk add --no-cache nginx openssl && \
 	mkdir -p /run/nginx && \
 	mkdir -p /etc/nginx/ssl && \
-	mkdir p /var/log/nginx && \
+	mkdir -p /var/log/nginx && \
 	adduser -H -D -s /sbin/nologin -g www www && \
 	mkdir /var/www/html && \
 	chown -R www:www /var/lib/nginx && \

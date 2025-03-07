@@ -1,5 +1,7 @@
 services:
   nginx:
+    depends_on:
+      - wordpress
     build: ./requirements/nginx
     image: nginx
     ports:
@@ -24,6 +26,8 @@ services:
     restart: unless-stopped
 
   wordpress:
+    depends_on:
+      - mariadb
     build: ./requirements/wordpress
     image: wordpress
     ports:
