@@ -61,14 +61,7 @@ if [ ! -f wp-config.php ]; then
     chown -R www:www /var/www/html/wp-content/themes
 
     # Install essential plugins
-    wp plugin install elementor --activate --allow-root
-    #wp plugin install wordpress-seo --activate --allow-root
     wp plugin install wp-fastest-cache --activate --allow-root
-    wp plugin install really-simple-ssl --activate --allow-root
-    wp plugin install updraftplus --activate --allow-root
-
-    # Optional: Install some demo content
-    wp plugin install wordpress-importer --activate --allow-root
 
     # Set correct permissions
     chown -R www:www /var/www/html
