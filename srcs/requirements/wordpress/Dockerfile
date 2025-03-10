@@ -1,4 +1,4 @@
-FROM alpine:3.20
+FROM alpine:3.20.6
 
 RUN addgroup -S www && \
     adduser -S -G www www && \
@@ -22,6 +22,7 @@ RUN addgroup -S www && \
     unzip && \
     ln -sf /usr/bin/php82 /usr/bin/php && \
     mkdir -p /run/php /var/www/html && \
+    chmod 755 /var/www/html && \
 	chown -R www:www /run/php /var/www/html && \
     echo "memory_limit = 256M" >> /etc/php82/php.ini && \
     echo "upload_max_filesize = 64M" >> /etc/php82/php.ini && \
