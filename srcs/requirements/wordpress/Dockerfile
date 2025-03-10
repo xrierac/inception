@@ -37,8 +37,6 @@ RUN chmod +x /usr/local/bin/wpscript.sh && \
 	chmod +x wp-cli.phar && \
 	mv wp-cli.phar /usr/local/bin/wp
 
-
-
 WORKDIR /var/www/html
 
 ENTRYPOINT ["/usr/local/bin/wpscript.sh"]

@@ -69,8 +69,8 @@ clean: down
 # Remove all data
 fclean: clean
 	@echo "$(YELLOW)Removing all data...$(RESET)"
-	@sudo rm -rf /home/$(USER)/data/wordpress/*
-	@sudo rm -rf /home/$(USER)/data/mariadb/*
+	@sudo rm -rf /home/$(USER)/data/wordpress
+	@sudo rm -rf /home/$(USER)/data/mariadb
 	@rm -rf $(SSL_DIR)/*
 	@echo "$(GREEN)All data removed.$(RESET)"
 
